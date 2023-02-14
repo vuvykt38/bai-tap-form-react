@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux'
 import { Button, Form, Input } from 'antd';
-import { actionCreateUser } from '../redux/actions/userActions'
+import { actionCreateUser, actionUpdateUser } from '../redux/actions/userActions'
 
 const MyFormItemContext = React.createContext([]);
 function toArr(str) {
@@ -38,9 +38,11 @@ function UserForm() {
     phone: "",
     age: "",
   });
-  const selectedUser = useSelector((state)=>{
+
+  const selectedUser = useSelector((state) => {
     return state.user.selectedUser
   });
+
   const handleChange = (evt) => {
     const { name, value } = evt.target
     setUser({
@@ -52,15 +54,18 @@ function UserForm() {
   const handleSubmit = () => {
     const validationErrors = {};
     for (let key in user) {
-      const message = validation(key, user[key]);
-      if (message) {
-        validationErrors[key] = message
+      if (validation(key, user[key])) {
+        validationErrors[key] = validation(key, user[key])
       }
     }
     if (Object.keys(validationErrors).length > 1) {
       setError(validationErrors)
     } else {
-      dispatch(actionCreateUser(user))
+      if (user.Users) {
+        dispatch(actionUpdateUser(user.Users, user))
+      } else {
+        dispatch(actionCreateUser(user))
+      }
       setUser({
         ...user,
         username: "",
@@ -71,7 +76,6 @@ function UserForm() {
         age: "",
       })
     }
-
   };
 
   const handleBlur = (evt) => {
@@ -87,8 +91,9 @@ function UserForm() {
       case 'username': {
         if (!value.trim()) {
           return "Username cannot be empty"
+        } else {
+          return "";
         }
-        return "";
       };
       case 'fullName': {
         if (!value.trim()) {
@@ -127,6 +132,12 @@ function UserForm() {
         return ""
     }
   };
+
+  useEffect(() => {
+    if (Object.keys(selectedUser).length !== 0) {
+      setUser(selectedUser)
+    }
+  }, [selectedUser])
 
   return (
     <div className="container mx-auto px-4">

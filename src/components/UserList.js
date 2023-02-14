@@ -13,7 +13,9 @@ function UserList(props) {
     dispatch(actionDeleteUser(userID))
   };
   const  handleSelect = (userID) => {
+    dispatch(actionSelectUser(userID))
   };
+  
   const columns = [
     {
       title: 'Full Name',
@@ -59,7 +61,6 @@ function UserList(props) {
       )
     },
   ];
-
   return (
     <div className='container mx-auto my-8 px-4'>
       <Table
